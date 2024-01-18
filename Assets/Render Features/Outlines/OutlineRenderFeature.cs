@@ -13,6 +13,11 @@ namespace RenderFeatures.Outlines
         public RenderPassEvent RenderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
 
         /// <summary>
+        /// The render texture format to use for RTHandles.
+        /// </summary>
+        public RenderTextureFormat RenderTextureFormat = RenderTextureFormat.Default;
+
+        /// <summary>
         /// The layer mask of the objects to include in the outlines.
         /// </summary>
         public LayerMask LayerMask = 0;
@@ -21,7 +26,7 @@ namespace RenderFeatures.Outlines
         /// The render layer mask of the objects to include in the outlines.
         /// </summary>
         public int RenderLayerMask = 1;
-    
+
         public float OutlineScale = 1;
         public Color OutlineColor = new(0, 22, 255);
 

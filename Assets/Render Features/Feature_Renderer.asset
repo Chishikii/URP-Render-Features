@@ -128,10 +128,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6c215d17fe4f81b1542c4319e87684, type: 3}
   m_Name: DesaturationFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   Settings:
     Saturation: 0
     RenderPassEvent: 300
+    RenderTextureFormat: 2
     LayerMask:
       serializedVersion: 2
       m_Bits: 4294967295
@@ -154,6 +155,7 @@ MonoBehaviour:
   m_Active: 1
   Settings:
     RenderPassEvent: 450
+    RenderTextureFormat: 2
     LayerMask:
       serializedVersion: 2
       m_Bits: 192

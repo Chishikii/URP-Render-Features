@@ -13,6 +13,11 @@ namespace RenderFeatures
         public RenderPassEvent RenderPassEvent = RenderPassEvent.AfterRenderingOpaques;
 
         /// <summary>
+        /// The render texture format to use for RTHandles.
+        /// </summary>
+        public RenderTextureFormat RenderTextureFormat = RenderTextureFormat.Default;
+
+        /// <summary>
         /// The LayerMask of the objects to include in the desaturation.
         /// </summary>
         public LayerMask LayerMask = 0;

@@ -41,7 +41,7 @@ namespace RenderFeatures
             m_ShaderTagIds.Add(new ShaderTagId("UniversalForwardOnly"));
         }
 
-        private void UpdateSettings(RTHandle maskTexture)
+        private void UpdateSettings()
         {
             if (m_FullscreenMaterial == null) return;
 
@@ -51,7 +51,7 @@ namespace RenderFeatures
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             var cameraTextureDescriptor = renderingData.cameraData.cameraTargetDescriptor;
-            cameraTextureDescriptor.colorFormat = RenderTextureFormat.ARGB32;
+            cameraTextureDescriptor.colorFormat = m_Settings.RenderTextureFormat;
             cameraTextureDescriptor.depthBufferBits = (int)DepthBits.None;
 
             RenderingUtils.ReAllocateIfNeeded(ref m_FilterTextureHandle, cameraTextureDescriptor,
@@ -87,7 +87,7 @@ namespace RenderFeatures
             var cmd = CommandBufferPool.Get();
             var cameraTargetHandle = renderingData.cameraData.renderer.cameraColorTargetHandle;
 
-            UpdateSettings(cameraTargetHandle);
+            UpdateSettings();
 
             using (new ProfilingScope(cmd, new ProfilingSampler("DesaturationPass")))
             {

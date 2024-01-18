@@ -64,7 +64,7 @@ namespace RenderFeatures.Outlines
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             var cameraTextureDescriptor = renderingData.cameraData.cameraTargetDescriptor;
-            cameraTextureDescriptor.colorFormat = RenderTextureFormat.ARGB32;
+            cameraTextureDescriptor.colorFormat = m_Settings.RenderTextureFormat;
             cameraTextureDescriptor.depthBufferBits = (int)DepthBits.None;
 
             RenderingUtils.ReAllocateIfNeeded(ref m_NormalsTextureHandle, cameraTextureDescriptor,
