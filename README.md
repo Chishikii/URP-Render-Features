@@ -15,7 +15,8 @@ shader directly via ids.
 ## Outline Render Feature
 
 The outline render feature is taken from [Robinseibold](https://github.com/Robinseibold/Unity-URP-Outlines/)
-implementation of [Erik Roystan Ross Outline Shader](https://roystan.net/articles/outline-shader.html).
+implementation of [Erik Roystan Ross Outline Shader](https://roystan.net/articles/outline-shader.html). 
+I've made some minor adjustments to make it compatible with newer urp versions.
 You can control which objects receive outlines by specifying LayerMasks and RenderLayers.
 
 ## Desaturation Render Feature
