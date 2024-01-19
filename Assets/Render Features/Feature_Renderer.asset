@@ -95,27 +95,6 @@ MonoBehaviour:
   m_CopyDepthMode: 0
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 1
---- !u!114 &4220821546060064356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 993147c9c988ec14dadd0a5bf3cd4d04, type: 3}
-  m_Name: DesaturateRenderFeature
-  m_EditorClassIdentifier: 
-  m_Active: 1
-  DesaturateSettings:
-    RenderPassEvent: 300
-    LayerMask:
-      m_Bits: 1
-    OverrideMaterial: {fileID: 2100000, guid: d890719ac8d65ba40997667f88caccde, type: 2}
-    OverrideMaterialPass: 0
-    ColorTargetDestinationID: Fresnel
-    BlitMaterial: {fileID: 2100000, guid: e4044ee18459ad84d954d3ed7de82db1, type: 2}
 --- !u!114 &4615170988440325254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -128,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6c215d17fe4f81b1542c4319e87684, type: 3}
   m_Name: DesaturationFeature
   m_EditorClassIdentifier: 
-  m_Active: 0
+  m_Active: 1
   Settings:
     Saturation: 0
     RenderPassEvent: 300
