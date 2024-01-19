@@ -14,7 +14,7 @@ namespace RenderFeatures.Outlines
         private readonly Material m_OutlineMaterial;
 
         private readonly FilteringSettings m_FilteringSettings;
-        private readonly List<ShaderTagId> m_ShaderTagIds = new List<ShaderTagId>();
+        private readonly List<ShaderTagId> m_ShaderTagIds = new();
 
         private RendererList m_RendererList;
 
@@ -127,14 +127,22 @@ namespace RenderFeatures.Outlines
         {
 #if UNITY_EDITOR
             if (EditorApplication.isPlaying)
+            {
                 Object.Destroy(m_NormalsMaterial);
+                Object.Destroy(m_OutlineMaterial);
+            }
             else
+            {
                 Object.DestroyImmediate(m_NormalsMaterial);
+                Object.DestroyImmediate(m_NormalsMaterial);
+            }
 #else
             Object.Destroy(m_NormalsMaterial);
+            Object.Destroy(m_OutlineMaterial);
 #endif
 
             m_NormalsTextureHandle?.Release();
+            m_TempColorTextureHandle?.Release();
         }
     }
 }
