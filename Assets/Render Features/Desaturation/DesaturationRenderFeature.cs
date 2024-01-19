@@ -43,11 +43,6 @@ namespace RenderFeatures
 
     public class DesaturationRenderFeature : ScriptableRendererFeature
     {
-        /// <summary>
-        /// Determines whether or not we only show the feature in the scene.
-        /// </summary>
-        public bool ShowInScene;
-
         public DesaturationSettings Settings;
 
         private DesaturationRenderPass m_DesaturationRenderPass;
@@ -73,7 +68,8 @@ namespace RenderFeatures
         /// <param name="renderingData">Rendering state. Use this to setup render passes.</param>
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
-            if (!ShowInScene && renderingData.cameraData.cameraType == CameraType.Game)
+            // Remove the feature from preview rendering.
+            if (renderingData.cameraData.cameraType <= CameraType.SceneView)
                 renderer.EnqueuePass(m_DesaturationRenderPass);
         }
 
