@@ -10,6 +10,7 @@ namespace RenderFeatures
     {
         private readonly DesaturationSettings m_Settings;
         private readonly Material m_FullscreenMaterial;
+        private readonly Material m_OverrideMaterial;
 
         private readonly FilteringSettings m_FilteringSettings;
         private readonly List<ShaderTagId> m_ShaderTagIds = new();
@@ -28,14 +29,19 @@ namespace RenderFeatures
 
         private static readonly int SaturationId = Shader.PropertyToID("_Saturation");
 
-        public DesaturationRenderPass(Material fullscreenMaterial, DesaturationSettings settings)
+        public DesaturationRenderPass(DesaturationSettings settings)
         {
             m_Settings = settings;
-            m_FullscreenMaterial = fullscreenMaterial;
+            m_FullscreenMaterial = new Material(settings.FullscreenShader);
 
+            if (settings.OverrideShader != null)
+                m_OverrideMaterial = new Material(settings.OverrideShader);
+
+            // Make sure we use layers in our filtering settings.
             var renderLayer = (uint)1 << settings.RenderLayerMask;
             m_FilteringSettings = new FilteringSettings(RenderQueueRange.opaque, settings.LayerMask, renderLayer);
 
+            // Use default shader tags.
             m_ShaderTagIds.Add(new ShaderTagId("SRPDefaultUnlit"));
             m_ShaderTagIds.Add(new ShaderTagId("UniversalForward"));
             m_ShaderTagIds.Add(new ShaderTagId("UniversalForwardOnly"));
@@ -71,7 +77,7 @@ namespace RenderFeatures
             var sortingCriteria = renderingData.cameraData.defaultOpaqueSortFlags;
 
             var drawingSettings = CreateDrawingSettings(m_ShaderTagIds, ref renderingData, sortingCriteria);
-            drawingSettings.overrideMaterial = m_Settings.RenderOverrideMaterial;
+            drawingSettings.overrideMaterial = m_OverrideMaterial;
             drawingSettings.overrideMaterialPassIndex = 0;
 
             var param = new RendererListParams(renderingData.cullResults, drawingSettings, m_FilteringSettings);
@@ -94,6 +100,7 @@ namespace RenderFeatures
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
 
+                // Initialize and draw all renderers.
                 InitRendererLists(ref renderingData, context);
                 cmd.DrawRendererList(m_RendererList);
 
@@ -118,15 +125,25 @@ namespace RenderFeatures
             CommandBufferPool.Release(cmd);
         }
 
+        /// <summary>
+        /// Releases all used resources. Called by the feature.
+        /// </summary>
         public void Dispose()
         {
 #if UNITY_EDITOR
             if (EditorApplication.isPlaying)
+            {
                 Object.Destroy(m_FullscreenMaterial);
+                Object.Destroy(m_OverrideMaterial);
+            }
             else
+            {
                 Object.DestroyImmediate(m_FullscreenMaterial);
+                Object.DestroyImmediate(m_OverrideMaterial);
+            }
 #else
             Object.Destroy(m_FullscreenMaterial);
+            Object.Destroy(m_OverrideMaterial);
 #endif
 
             m_FilterTextureHandle?.Release();

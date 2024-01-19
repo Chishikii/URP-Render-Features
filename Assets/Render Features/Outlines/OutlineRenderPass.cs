@@ -23,8 +23,12 @@ namespace RenderFeatures.Outlines
         /// </summary>
         private RTHandle m_NormalsTextureHandle;
 
+        /// <summary>
+        /// Used as a temporary texture when blitting fullscreen.
+        /// </summary>
         private RTHandle m_TempColorTextureHandle;
 
+        // Ids of shader properties to use when updating.
         private static readonly int OutlineScaleId = Shader.PropertyToID("_OutlineScale");
         private static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
         private static readonly int RobertsCrossMultiplierId = Shader.PropertyToID("_RobertsCrossMultiplier");
@@ -39,14 +43,19 @@ namespace RenderFeatures.Outlines
             m_NormalsMaterial = new Material(Shader.Find("Hidden/ViewSpaceNormals"));
             m_OutlineMaterial = new Material(Shader.Find("Hidden/Outlines"));
 
+            // Make sure we use our layers in the filtering settings.
             var renderLayer = (uint)1 << settings.RenderLayerMask;
             m_FilteringSettings = new FilteringSettings(RenderQueueRange.opaque, settings.LayerMask, renderLayer);
 
+            // Use default shader tags.
             m_ShaderTagIds.Add(new ShaderTagId("SRPDefaultUnlit"));
             m_ShaderTagIds.Add(new ShaderTagId("UniversalForward"));
             m_ShaderTagIds.Add(new ShaderTagId("UniversalForwardOnly"));
         }
 
+        /// <summary>
+        /// Updates shader properties based on settings.
+        /// </summary>
         private void UpdateSettings()
         {
             if (m_OutlineMaterial == null)
@@ -106,12 +115,16 @@ namespace RenderFeatures.Outlines
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
 
+                // Initialize and draw all renderers.
                 InitRendererLists(ref renderingData, context);
                 cmd.DrawRendererList(m_RendererList);
 
-                // Expose the normals texture to shaders.
+                // Pass our filter texture to shaders as a global texture reference.
+                // Obtain this in a shader graph as a Texture2D with exposed un-ticked
+                // and reference _NormalsTexture.
                 cmd.SetGlobalTexture(Shader.PropertyToID(m_NormalsTextureHandle.name), m_NormalsTextureHandle);
 
+                // For some reasons these rt are null for a frame when selecting in scene view so we need to check for null.
                 if (cameraTargetHandle.rt != null && m_TempColorTextureHandle.rt != null)
                 {
                     Blitter.BlitCameraTexture(cmd, cameraTargetHandle, m_TempColorTextureHandle, m_OutlineMaterial, 0);
@@ -123,6 +136,9 @@ namespace RenderFeatures.Outlines
             CommandBufferPool.Release(cmd);
         }
 
+        /// <summary>
+        /// Releases all used resources. Called by the feature.
+        /// </summary>
         public void Dispose()
         {
 #if UNITY_EDITOR

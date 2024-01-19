@@ -29,7 +29,6 @@ namespace RenderFeatures.Outlines
 
         public float OutlineScale = 1;
         public Color OutlineColor = new(0, 22, 255);
-
         public float RobertsCrossMultiplier = 500;
 
         public float DepthThreshold = 10;
@@ -48,6 +47,9 @@ namespace RenderFeatures.Outlines
 
         private OutlineRenderPass m_OutlineRenderPass;
 
+        /// <summary>
+        /// Initializes this feature's resources. This is called every time serialization happens.
+        /// </summary>
         public override void Create()
         {
             m_OutlineRenderPass = new OutlineRenderPass(Settings)
@@ -56,9 +58,23 @@ namespace RenderFeatures.Outlines
             };
         }
 
+        /// <summary>
+        /// Injects one or multiple <c>ScriptableRenderPass</c> in the renderer.
+        /// </summary>
+        /// <param name="renderer">Renderer used for adding render passes.</param>
+        /// <param name="renderingData">Rendering state. Use this to setup render passes.</param>
         public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
         {
             renderer.EnqueuePass(m_OutlineRenderPass);
+        }
+
+        /// <summary>
+        /// Clean up any resources used by the render feature and pass.
+        /// </summary>
+        protected override void Dispose(bool disposing)
+        {
+            // Make sure we also clean up the passes resources.
+            m_OutlineRenderPass.Dispose();
         }
     }
 }
