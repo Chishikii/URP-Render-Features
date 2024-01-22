@@ -107,7 +107,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd6c215d17fe4f81b1542c4319e87684, type: 3}
   m_Name: DesaturationFeature
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   Settings:
     Saturation: 0
     RenderPassEvent: 300
@@ -116,7 +116,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 4294967295
     RenderLayerMask: 1
-    RenderOverrideMaterial: {fileID: 0}
+    OverrideShader: {fileID: 0}
     FullscreenShader: {fileID: -6465566751694194690, guid: ddfedb8b61bd7fd4aa61ff4ebca85002,
       type: 3}
 --- !u!114 &7740730535257563512
@@ -141,8 +141,8 @@ MonoBehaviour:
     RenderLayerMask: 2
     OutlineScale: 1
     OutlineColor: {r: 0, g: 22, b: 255, a: 1}
-    RobertsCrossMultiplier: 500
-    DepthThreshold: 10
+    RobertsCrossMultiplier: 0
+    DepthThreshold: 1.5
     NormalThreshold: 0.6
-    SteepAngleThreshold: 0
-    SteepAngleMultiplier: 100
+    SteepAngleThreshold: 0.2
+    SteepAngleMultiplier: 25

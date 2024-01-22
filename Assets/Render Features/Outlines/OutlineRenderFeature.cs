@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization;
 
 namespace RenderFeatures.Outlines
 {
@@ -11,11 +13,6 @@ namespace RenderFeatures.Outlines
         /// When to render the outlines.
         /// </summary>
         public RenderPassEvent RenderPassEvent = RenderPassEvent.BeforeRenderingTransparents;
-
-        /// <summary>
-        /// The render texture format to use for RTHandles.
-        /// </summary>
-        public RenderTextureFormat RenderTextureFormat = RenderTextureFormat.Default;
 
         /// <summary>
         /// The layer mask of the objects to include in the outlines.
@@ -38,12 +35,44 @@ namespace RenderFeatures.Outlines
         public float SteepAngleMultiplier = 100;
     }
 
+    [Serializable]
+    public class ViewSpaceNormalTextureSettings
+    {
+        /// <summary>
+        /// Format of the render texture. In order to enable HDR dependent post processing use at least ARGBHalf.
+        /// </summary>
+        public RenderTextureFormat RenderTextureFormat = RenderTextureFormat.Default;
+
+        /// <summary>
+        /// The amount of bits restored for the depth buffer.
+        /// </summary>
+        public DepthBits DepthBufferBits = DepthBits.None;
+
+        /// <summary>
+        /// The filter mode of the texture.
+        /// </summary>
+        public FilterMode FilterMode = FilterMode.Point;
+
+        /// <summary>
+        /// Color used to fill empty areas.
+        /// </summary>
+        public Color BackgroundColor = Color.black;
+
+        /// <summary>
+        /// Whether the objects should ignore scene objects when rendering or not.
+        /// </summary>
+        public bool IgnoreSceneObjects = true;
+    }
+
     public class OutlineRenderFeature : ScriptableRendererFeature
     {
         /// <summary>
         /// The settings used for the outline renderer feature.
         /// </summary>
-        public OutlineSettings Settings = new();
+        [FormerlySerializedAs("Settings")]
+        public OutlineSettings OutlineSettings = new();
+
+        public ViewSpaceNormalTextureSettings TextureSettings = new();
 
         private OutlineRenderPass m_OutlineRenderPass;
 
@@ -52,10 +81,7 @@ namespace RenderFeatures.Outlines
         /// </summary>
         public override void Create()
         {
-            m_OutlineRenderPass = new OutlineRenderPass(Settings)
-            {
-                renderPassEvent = Settings.RenderPassEvent,
-            };
+            m_OutlineRenderPass = new OutlineRenderPass(OutlineSettings, TextureSettings);
         }
 
         /// <summary>
