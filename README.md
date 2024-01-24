@@ -9,6 +9,8 @@ Something you need to be aware of if you're coming from older version is that th
 fullscreen shader.
 This shader can get the "_BlitSource" texture directly via a "URP Sample Buffer" node.
 
+Writing depth is a little different as well. RTHandles don't support color and depth / stencil information at the same time.
+
 I've made textures available by setting them as global textures in the command buffer but you could also pass them to the
 shader directly via ids.
 
