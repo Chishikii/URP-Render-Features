@@ -83,8 +83,10 @@ namespace RenderFeatures.Outlines
             descriptor.depthBufferBits = (int)DepthBits.None;
 
             // Reallocate render textures if needed
-            RenderingUtils.ReAllocateIfNeeded(ref m_NormalsTextureHandle, descriptor, name: "_NormalsTexture");
-            RenderingUtils.ReAllocateIfNeeded(ref m_TempColorTextureHandle, descriptor, name: "_TempColorTexture");
+            RenderingUtils.ReAllocateIfNeeded(ref m_NormalsTextureHandle, descriptor, name: "_NormalsTexture",
+                wrapMode: TextureWrapMode.Clamp);
+            RenderingUtils.ReAllocateIfNeeded(ref m_TempColorTextureHandle, descriptor, name: "_TempColorTexture",
+                wrapMode: TextureWrapMode.Clamp);
 
             var cameraTargetDepth = renderingData.cameraData.renderer.cameraDepthTargetHandle;
             ConfigureTarget(m_NormalsTextureHandle, cameraTargetDepth);
