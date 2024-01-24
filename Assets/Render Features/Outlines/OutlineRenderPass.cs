@@ -9,8 +9,7 @@ namespace RenderFeatures.Outlines
 {
     public class OutlineRenderPass : ScriptableRenderPass
     {
-        private readonly OutlineSettings m_OutlineSettings;
-        private readonly ViewSpaceNormalTextureSettings m_TextureSettings;
+        private readonly OutlineSettings m_Settings;
 
         private readonly Material m_NormalsMaterial;
         private readonly Material m_OutlineMaterial;
@@ -21,12 +20,12 @@ namespace RenderFeatures.Outlines
         private RendererList m_RendererList;
 
         /// <summary>
-        /// Used as a render target for drawing objects into.
+        /// Used as a render target for drawing color information.
         /// </summary>
         private RTHandle m_NormalsTextureHandle;
 
         /// <summary>
-        /// Used as a temporary texture when blitting fullscreen.
+        /// Used as a temporary texture target when blitting.
         /// </summary>
         private RTHandle m_TempColorTextureHandle;
 
@@ -39,20 +38,19 @@ namespace RenderFeatures.Outlines
         private static readonly int SteepAngleThresholdId = Shader.PropertyToID("_SteepAngleThreshold");
         private static readonly int SteepAngleMultiplierId = Shader.PropertyToID("_SteepAngleMultiplier");
 
-        public OutlineRenderPass(OutlineSettings outlineSettings, ViewSpaceNormalTextureSettings textureSettings)
+        public OutlineRenderPass(OutlineSettings settings)
         {
-            m_OutlineSettings = outlineSettings;
-            m_TextureSettings = textureSettings;
+            m_Settings = settings;
             m_NormalsMaterial = new Material(Shader.Find("Hidden/ViewSpaceNormals"));
             m_OutlineMaterial = new Material(Shader.Find("Hidden/Outlines"));
 
             // Set the stage of when this feature will get rendered.
-            renderPassEvent = outlineSettings.RenderPassEvent;
+            renderPassEvent = m_Settings.RenderPassEvent;
 
             // Make sure we use our layers in the filtering settings.
-            var renderLayer = (uint)1 << outlineSettings.RenderLayerMask;
+            var renderLayer = (uint)1 << m_Settings.RenderLayerMask;
             m_FilteringSettings =
-                new FilteringSettings(RenderQueueRange.opaque, outlineSettings.LayerMask, renderLayer);
+                new FilteringSettings(RenderQueueRange.opaque, m_Settings.LayerMask, renderLayer);
 
             // Use default shader tags.
             m_ShaderTagIds.Add(new ShaderTagId("SRPDefaultUnlit"));
@@ -68,41 +66,37 @@ namespace RenderFeatures.Outlines
             if (m_OutlineMaterial == null)
                 return;
 
-            m_OutlineMaterial.SetFloat(OutlineScaleId, m_OutlineSettings.OutlineScale);
-            m_OutlineMaterial.SetColor(OutlineColorId, m_OutlineSettings.OutlineColor);
-            m_OutlineMaterial.SetFloat(RobertsCrossMultiplierId, m_OutlineSettings.RobertsCrossMultiplier);
-            m_OutlineMaterial.SetFloat(DepthThresholdId, m_OutlineSettings.DepthThreshold);
-            m_OutlineMaterial.SetFloat(NormalThresholdId, m_OutlineSettings.NormalThreshold);
-            m_OutlineMaterial.SetFloat(SteepAngleThresholdId, m_OutlineSettings.SteepAngleThreshold);
-            m_OutlineMaterial.SetFloat(SteepAngleMultiplierId, m_OutlineSettings.SteepAngleMultiplier);
+            m_OutlineMaterial.SetFloat(OutlineScaleId, m_Settings.OutlineScale);
+            m_OutlineMaterial.SetColor(OutlineColorId, m_Settings.OutlineColor);
+            m_OutlineMaterial.SetFloat(RobertsCrossMultiplierId, m_Settings.RobertsCrossMultiplier);
+            m_OutlineMaterial.SetFloat(DepthThresholdId, m_Settings.DepthThreshold);
+            m_OutlineMaterial.SetFloat(NormalThresholdId, m_Settings.NormalThreshold);
+            m_OutlineMaterial.SetFloat(SteepAngleThresholdId, m_Settings.SteepAngleThreshold);
+            m_OutlineMaterial.SetFloat(SteepAngleMultiplierId, m_Settings.SteepAngleMultiplier);
         }
 
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
-            // Set up texture descriptors
+            // Set up texture descriptors for color and depth
             var descriptor = renderingData.cameraData.cameraTargetDescriptor;
-            descriptor.colorFormat = m_TextureSettings.RenderTextureFormat;
-            descriptor.depthBufferBits = (int)m_TextureSettings.DepthBufferBits;
+            descriptor.colorFormat = m_Settings.RenderTextureFormat;
+            descriptor.depthBufferBits = (int)DepthBits.None;
 
             // Reallocate render textures if needed
             RenderingUtils.ReAllocateIfNeeded(ref m_NormalsTextureHandle, descriptor, name: "_NormalsTexture");
             RenderingUtils.ReAllocateIfNeeded(ref m_TempColorTextureHandle, descriptor, name: "_TempColorTexture");
 
-            var cameraDepthTextureHandle = renderingData.cameraData.renderer.cameraDepthTargetHandle;
-
-            if (m_TextureSettings.IgnoreSceneObjects)
-                ConfigureTarget(m_NormalsTextureHandle);
-            else
-                ConfigureTarget(m_NormalsTextureHandle, cameraDepthTextureHandle);
+            var cameraTargetDepth = renderingData.cameraData.renderer.cameraDepthTargetHandle;
+            ConfigureTarget(m_NormalsTextureHandle, cameraTargetDepth);
 
             // Make sure the color is transparent.
-            m_TextureSettings.BackgroundColor.a = 0;
-            ConfigureClear(ClearFlag.Color, m_TextureSettings.BackgroundColor);
+            m_Settings.BackgroundColor.a = 0;
+            ConfigureClear(ClearFlag.Color, m_Settings.BackgroundColor);
         }
 
         private void InitRendererLists(ref RenderingData renderingData, ScriptableRenderContext context)
         {
-            const SortingCriteria sortingCriteria = SortingCriteria.BackToFront;
+            var sortingCriteria = renderingData.cameraData.defaultOpaqueSortFlags;
 
             var drawingSettings = CreateDrawingSettings(m_ShaderTagIds, ref renderingData, sortingCriteria);
             drawingSettings.overrideMaterial = m_NormalsMaterial;
@@ -126,6 +120,9 @@ namespace RenderFeatures.Outlines
             {
                 context.ExecuteCommandBuffer(cmd);
                 cmd.Clear();
+
+                // Make sure we clear the depth buffer.
+                cmd.ClearRenderTarget(RTClearFlags.All, m_Settings.BackgroundColor);
 
                 // Initialize and draw all renderers.
                 InitRendererLists(ref renderingData, context);

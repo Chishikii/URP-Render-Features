@@ -133,8 +133,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   Settings:
-    RenderPassEvent: 450
+    RenderPassEvent: 500
     RenderTextureFormat: 2
+    DepthBufferBits: 8
+    BackgroundColor: {r: 0, g: 0, b: 0, a: 0}
     LayerMask:
       serializedVersion: 2
       m_Bits: 192
@@ -143,6 +145,6 @@ MonoBehaviour:
     OutlineColor: {r: 0, g: 22, b: 255, a: 1}
     RobertsCrossMultiplier: 0
     DepthThreshold: 1.5
-    NormalThreshold: 0.6
+    NormalThreshold: 0.4
     SteepAngleThreshold: 0.2
     SteepAngleMultiplier: 25
