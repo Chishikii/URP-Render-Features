@@ -24,24 +24,22 @@ namespace Xenon
         private static readonly int OutlineColor = Shader.PropertyToID("_OutlineColor");
 
         private readonly Material _blitMaterial;
-        private readonly OutlineRenderFeature.OutlineSettings _outlineSettings;
 
         public OutlinePassFinal(OutlineRenderFeature.Settings settings, OutlineRenderFeature.OutlineSettings outlineSettings)
         {
             renderPassEvent = settings.RenderPassEvent;
             _blitMaterial = settings.BlitMaterial;
-            _outlineSettings = outlineSettings;
 
             if (_blitMaterial == null)
                 return;
 
-            _blitMaterial.SetFloat(OutlineScale, _outlineSettings.OutlineScale);
-            _blitMaterial.SetFloat(RobertsCrossMultiplier, _outlineSettings.RobertsCrossMultiplier);
-            _blitMaterial.SetFloat(DepthThreshold, _outlineSettings.DepthThreshold);
-            _blitMaterial.SetFloat(NormalThreshold, _outlineSettings.NormalThreshold);
-            _blitMaterial.SetFloat(SteepAngleThreshold, _outlineSettings.SteepAngleThreshold);
-            _blitMaterial.SetFloat(SteepAngleMultiplier, _outlineSettings.SteepAngleMultiplier);
-            _blitMaterial.SetColor(OutlineColor, _outlineSettings.OutlineColor);
+            _blitMaterial.SetFloat(OutlineScale, outlineSettings.OutlineScale);
+            _blitMaterial.SetFloat(RobertsCrossMultiplier, outlineSettings.RobertsCrossMultiplier);
+            _blitMaterial.SetFloat(DepthThreshold, outlineSettings.DepthThreshold);
+            _blitMaterial.SetFloat(NormalThreshold, outlineSettings.NormalThreshold);
+            _blitMaterial.SetFloat(SteepAngleThreshold, outlineSettings.SteepAngleThreshold);
+            _blitMaterial.SetFloat(SteepAngleMultiplier, outlineSettings.SteepAngleMultiplier);
+            _blitMaterial.SetColor(OutlineColor, outlineSettings.OutlineColor);
         }
 
         private static void ExecutePass(PassData passData, RasterGraphContext context)
