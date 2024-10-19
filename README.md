@@ -14,6 +14,12 @@ implementation of [Erik Roystan Ross Outline Shader](https://roystan.net/article
 I've made some major adjustments to make it compatible with newer urp versions and the RenderGraph api.
 You can control which objects receive outlines by specifying LayerMasks and RenderLayers.
 
+You can modify if the outlines should be hidden behind other object or render through.
+
+|                Hidden                 |                 Showing                  |
+|:-------------------------------------:|:----------------------------------------:|
+| ![](Documentation/outlines_depth.png) | ![](Documentation/outlines_no_depth.png) |
+
 ## Desaturation Render Feature
 
 Similar to the outlines this feature can be controlled by using LayerMasks and RenderLayers.
