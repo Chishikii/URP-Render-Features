@@ -71,6 +71,7 @@ namespace Xenon
 
             var targetDesc = renderGraph.GetTextureDesc(resourceData.cameraColor);
             targetDesc.name = "_OutlineObjects";
+            targetDesc.format = GraphicsFormat.R8G8B8A8_SRGB;
 
             var destinationHandle = renderGraph.CreateTexture(targetDesc);
             outlineData.FilterTextureHandle = destinationHandle;
