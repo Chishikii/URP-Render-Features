@@ -4,7 +4,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Rendering.RenderGraphModule;
 
-namespace Xenon
+namespace Chishikii.RenderFeatures
 {
     public class OutlineRenderFeature : ScriptableRendererFeature
     {

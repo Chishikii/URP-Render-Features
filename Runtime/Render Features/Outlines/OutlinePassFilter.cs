@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using UnityEngine.Rendering.Universal;
 
-namespace Xenon
+namespace Chishikii.RenderFeatures
 {
     public class OutlinePassFilter : ScriptableRenderPass
     {
