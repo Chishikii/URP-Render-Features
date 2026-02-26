@@ -1,0 +1,13 @@
+{
+  "name": "com.chishikii.render-features",
+  "displayName": "Render Features",
+  "version": "1.0.0",
+  "unity": "6000.3",
+  "unityRelease": "2f1",
+  "author": {
+    "name": "Finn Pelzer",
+    "url": "https://finn-pelzer.com",
+    "email": "contact@finn-pelzer.com"
+  },
+  "hideInEditor": false
+}
