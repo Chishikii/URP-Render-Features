@@ -1,34 +1,79 @@
 # URP Render Features
 
-Various custom render features for unity 6.
-These features are written with URP Version 17.0.3 using RenderGraph and include RendererLists and the Blitter API.
+A small collection of custom **Universal Render Pipeline (URP)** renderer features. The main goal is to make a couple of
+common “selective effects” (outlines, desaturation, etc.) easy to apply to *only some* objects, while staying compatible
+with newer URP versions and the **RenderGraph** workflow.
 
-A big help was [this](https://www.cyanilux.com/tutorials/custom-renderer-features/) blog post by Cyanilux and looking at
-how unity implemented some of their sample render features.
-These can be found in the URP package under samples.
+## Requirements
 
-## Outline Render Feature
+- **Unity 6 or newer** (minimum)
+- **Universal Render Pipeline (URP)** enabled for your project
 
-The outline render feature is taken from [Robinseibold](https://github.com/Robinseibold/Unity-URP-Outlines/)
-implementation of [Erik Roystan Ross Outline Shader](https://roystan.net/articles/outline-shader.html).
-I've made some major adjustments to make it compatible with newer urp versions and the RenderGraph api.
-You can control which objects receive outlines by specifying LayerMasks and RenderLayers.
+> Note: This package is URP-specific and won’t work with the Built-in Render Pipeline or HDRP.
 
-You can modify if the outlines should be hidden behind other object or render through.
+## Included Features
+
+### 1) Filtered Fullscreen Render Feature
+
+This feature renders a *filtered subset* of objects into an intermediate texture, then runs a standard fullscreen pass
+using that texture as input.
+
+**Filtering options**
+
+- **LayerMask**
+- **Rendering Layers** (RenderLayers)
+
+**What you can do with it**
+
+- Outlines on specific objects
+- Desaturation / tint / highlight effects
+- Any custom effect you can express as a material/shader in a fullscreen pass
+
+### 2) Outlines (Example Use Case)
 
 |                Hidden                 |                 Showing                  |
 |:-------------------------------------:|:----------------------------------------:|
 | ![](Documentation/outlines_depth.png) | ![](Documentation/outlines_no_depth.png) |
 
-## Desaturation Render Feature
+### 3) Desaturation (Example Use Case)
 
-Similar to the outlines this feature can be controlled by using LayerMasks and RenderLayers.
+Like the outlines setup, desaturation can be limited to specific objects using **LayerMask** and **Rendering Layers**.
 
-**NOTE: The is current version is not updated to use the RenderGraph for this feature.**
+## How it Works (High Level)
 
-## Blur Render Feature
+1. **Filtered pass**: render only the selected objects into a texture (optionally with a replacement material).
+2. **Fullscreen pass**: run a fullscreen material that reads the filtered texture and composites the final result to the
+   camera target.
 
-This was take and adapted from Unity's documentation
-tutorial [here](https://docs.unity3d.com/Packages/com.unity.render-pipelines.universal@16.0/manual/containers/create-custom-renderer-feature-1.html).
+This separation makes it straightforward to target only certain objects without affecting the whole scene.
 
-**NOTE: The is current version is not updated to use the RenderGraph for this feature.**
+## Setup (Typical Workflow)
+
+1. Ensure your project uses **URP** and you have a URP Renderer Asset in your pipeline settings.
+2. Add the renderer feature(s) to your URP Renderer Asset:
+    - Open the Renderer Asset in the Inspector
+    - Click **Add Renderer Feature**
+    - Select the feature you want to use
+3. Configure filtering:
+    - Set the **LayerMask** and/or **Rendering Layers** so only intended objects are included.
+4. Assign or tweak the material used for the fullscreen pass to get the desired effect.
+
+## Credits / References
+
+- Cyanilux tutorial on renderer features: https://www.cyanilux.com/tutorials/custom-renderer-features/
+- Original outline feature inspiration:
+    - Robinseibold’s URP outlines: https://github.com/Robinseibold/Unity-URP-Outlines/
+    - Erik Roystan Ross outline shader article: https://roystan.net/articles/outline-shader.html
+- Also informed by Unity’s official URP sample renderer features (found in the URP package samples).
+
+## Contributing
+
+Issues and PRs are welcome—especially for:
+
+- Additional example effects built on the filtered fullscreen approach
+- Compatibility fixes across URP/Unity minor versions
+- Documentation improvements (more screenshots, clearer setup steps)
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
