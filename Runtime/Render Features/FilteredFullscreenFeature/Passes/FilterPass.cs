@@ -7,7 +7,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace Chishikii.RenderFeatures
 {
-    public class OutlinePassFilter : ScriptableRenderPass
+    public class FilterPass : ScriptableRenderPass
     {
         private class PassData
         {
@@ -18,8 +18,11 @@ namespace Chishikii.RenderFeatures
 
         private readonly bool _clearDepth;
         private readonly Material _overrideMaterial;
+
         private readonly LayerMask _layerMask;
         private readonly RenderingLayerMask _renderingLayerMask;
+
+        private readonly string _name;
 
         private readonly List<ShaderTagId> _shaderTagIds = new()
         {
@@ -29,13 +32,14 @@ namespace Chishikii.RenderFeatures
             new ShaderTagId("LightweightForward"),
         };
 
-        public OutlinePassFilter(OutlineRenderFeature.Settings settings, Material overrideMaterial)
+        public FilterPass(FilteredFullScreenRenderFeature.Settings settings)
         {
             renderPassEvent = settings.RenderPassEvent;
 
+            _name = settings.Name;
             _layerMask = settings.LayerMask;
             _renderingLayerMask = settings.RenderingLayerMask;
-            _overrideMaterial = overrideMaterial;
+            _overrideMaterial = settings.OverrideMaterial;
             _clearDepth = settings.ClearDepth;
         }
 
@@ -46,9 +50,12 @@ namespace Chishikii.RenderFeatures
             var lightData = context.Get<UniversalLightData>();
 
             var sortingCriteria = passData.CameraData.defaultOpaqueSortFlags;
+
             var filterSettings = new FilteringSettings(RenderQueueRange.opaque, _layerMask, _renderingLayerMask);
             var drawSettings = RenderingUtils.CreateDrawingSettings(_shaderTagIds, renderingData, cameraData, lightData, sortingCriteria);
-            drawSettings.overrideMaterial = _overrideMaterial;
+            if (_overrideMaterial != null)
+                drawSettings.overrideMaterial = _overrideMaterial;
+
             var param = new RendererListParams(renderingData.cullResults, drawSettings, filterSettings);
 
             passData.RendererListHandle = renderGraph.CreateRendererList(param);
@@ -64,12 +71,12 @@ namespace Chishikii.RenderFeatures
         {
             var cameraData = frameData.Get<UniversalCameraData>();
             var resourceData = frameData.Get<UniversalResourceData>();
-            var outlineData = frameData.GetOrCreate<OutlineRenderFeature.OutlineData>();
+            var outlineData = frameData.GetOrCreate<FilteredFullScreenRenderFeature.FilterData>();
 
-            using var builder = renderGraph.AddRasterRenderPass<PassData>("OutlinePass_Render", out var passData, new ProfilingSampler("OutlinePass_Render"));
+            using var builder = renderGraph.AddRasterRenderPass<PassData>($"{_name}_Filter", out var passData, new ProfilingSampler($"{_name}_Filter"));
 
             var targetDesc = renderGraph.GetTextureDesc(resourceData.cameraColor);
-            targetDesc.name = "_OutlineObjects";
+            targetDesc.name = "_FilterTexture";
             targetDesc.format = GraphicsFormat.R8G8B8A8_SRGB;
 
             var destinationHandle = renderGraph.CreateTexture(targetDesc);
